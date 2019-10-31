@@ -84,7 +84,73 @@ _FP12* WINAPI xll_pwflat_forward_value(HANDLEX fwd, const _FP12* pt)
 	return result.get();
 }
 
-//!!! Implement PWFLAT.FORWARD.SPOT
+// Implement PWFLAT.FORWARD.SPOT
 
-//!!! Implement PWFLAT.FORWARD.DISCOUNT
+AddIn xai_pwflat_forward_spot(
+	Function(XLL_FP, L"?xll_pwflat_forward_spot", CATEGORY L".FORWARD.SPOT")
+	.Arg(XLL_HANDLE, L"forward", L"is a handle to a piecewise flat forward. ")
+	.Arg(XLL_FP, L"times", L"is an array of times at which to find the spot. ")
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return an array of spot corresponding to times. ")
+	.Documentation(
+		L"Return an array of spot values corresponding to times. "
+	)
+);
+_FP12* WINAPI xll_pwflat_forward_spot(HANDLEX fwd, const _FP12* pt)
+{
+#pragma XLLEXPORT
+	static xll::FP12 result;
+
+	try {
+		handle<forward> fwd_(fwd);
+
+		result.resize(rows(*pt), columns(*pt));
+		for (int i = 0; i < size(*pt); ++i) {
+			result[i] = fwd_->spot(pt->array[i]);
+		}
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result.get();
+}
+
+
+
+// Implement PWFLAT.FORWARD.DISCOUNT
+
+AddIn xai_pwflat_forward_discount(
+	Function(XLL_FP, L"?xll_pwflat_forward_discount", CATEGORY L".FORWARD.DISCOUNT")
+	.Arg(XLL_HANDLE, L"forward", L"is a handle to a piecewise flat forward. ")
+	.Arg(XLL_FP, L"times", L"is an array of times at which to find the discount. ")
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return an array of discount values corresponding to times. ")
+	.Documentation(
+		L"Return an array of discount corresponding to times. "
+	)
+);
+_FP12* WINAPI xll_pwflat_forward_discount(HANDLEX fwd, const _FP12* pt)
+{
+#pragma XLLEXPORT
+	static xll::FP12 result;
+
+	try {
+		handle<forward> fwd_(fwd);
+
+		result.resize(rows(*pt), columns(*pt));
+		for (int i = 0; i < size(*pt); ++i) {
+			result[i] = fwd_->discount(pt->array[i]);
+		}
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result.get();
+}
 

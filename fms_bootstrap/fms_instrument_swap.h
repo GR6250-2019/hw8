@@ -8,10 +8,31 @@
 
 namespace fms::instrument {
 	
-	//!!! Implement helper functions.
-	// auto make_time(....) -> (0, 1/freq,  ..., maturity)
+	//Implement helper functions.
+	//	auto make_time(....) -> (0, 1/freq,  ..., maturity)
+	auto make_time(t);
+	t = n / frequency;
+	++n;
+	assert(maturity == t);
 	// auto make_cash(....) -> (-1, c/freq, ..., 1 + c/freq)
+	auto make_cash(c) = c / frequency;
+	++n;
+	assert(maturity == make_cash());
 
-	//!!! Implement the class interest_rate_swap in namespace fms::instrument.
+	//Implement the class interest_rate_swap in namespace fms::instrument
+	
+
+	template<class U = double, class C = double>
+	struct interest_rate_swap : public sequence<fms::sequence::list<U>, fms::sequence::list<C>>{
+	interest_rate_swap(U maturity, U frequency, C coupon)
+			: sequence<fms::sequence::list<U>, fms::sequence::list<C>>, fms::sequence::list<F>>(
+				fms::sequence::list<U>({ 0, maturity }), fms::sequence::list<C>({ -1, 1 + coupon / frequency })
+		{ }
+	};
+
+	
+	
+	
+
 
 }
