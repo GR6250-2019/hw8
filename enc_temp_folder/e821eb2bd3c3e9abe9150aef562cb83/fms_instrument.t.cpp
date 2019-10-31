@@ -82,8 +82,8 @@ int test_instrument_fra_int_int_int = test_instrument_fra<int,int>();
 template<class U, class C>
 int test_instrument_swap()
 {
-	
-	interest_rate_swap<U, C> swap(2, 1, 6); //assume the cash flow has three element i = 0,1,2
+	/***
+	interest_rate_swap<U, C> swap(2, 1, 6);
 
 	auto u = swap.time();
 	assert(0 == *u);
@@ -105,12 +105,11 @@ int test_instrument_swap()
 	++swap;
 	assert(std::pair(2, 1 + 6) == *swap);
 	++swap;
-	assert(!swap);
-
-	/***
-	interest_rate_swap<U, C> swap(2,5,4); //1,2,4
+	assert(!swap); ***/
 
 	
+	interest_rate_swap<U, C> swap(2,5,4); //1,2,4
+
 	auto u = swap.time();
 
 	double res;
@@ -155,7 +154,7 @@ int test_instrument_swap()
 	++k;
 	assert(std::pair(2.0, 1.0+(double(4)/5)) == *swap);
 	assert(!swap);
-	***/
+	
 	return 0;
 }
 int test_instrument_swap_int_int_int = test_instrument_swap<double,double>();

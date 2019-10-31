@@ -11,8 +11,9 @@
 namespace fms::instrument {
 	
 	//!!! Implement helper functions.
-	auto make_time(double m, double f) {
-		fms::sequence::list<double> myList = {};
+	template<class U = double, class C = double>
+	auto make_time(U m, U f) {
+		std::vector<U> myList = {};
 		for (int i = 0; i <= m * f; i++) {
 			if (i == 0){
 				myList.push_back(i);
@@ -24,8 +25,10 @@ namespace fms::instrument {
 		return myList;
 		//(0, 1 / freq, ..., maturity)
 	}
-	auto make_cash(double m, double f, double c) {
-		fms::sequence::list<double> myList2 = {};
+
+	template<class U = double, class C = double>
+	auto make_cash(U m, U f, C c) {
+		std::vector<U> myList2 = {};
 		for (int i = 0; i <= m * f; i++) {
 			if (i == 0) {
 				myList2.push_back(-1);
