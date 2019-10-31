@@ -163,3 +163,39 @@ HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward
 
 }
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the time in years at which the forward rate starts taking into account.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the time in years at which the forward rate matures.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the simple compounding rate for the forward rate.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a forward rate instrument.")
+	.Documentation(
+		L"A forward rate agreement has two cash flows. The first is at time effective and is always -1. "
+		L"This corresponds to having initial price 1. "
+		L"The second occurs at " C_(L"tenor+effective") L" and is equal to  1 + r" delta_
+		L" where r is the simple compounding " C_(L"rate") L" and " delta_
+		L" is the " C_(L"tenor") L" in years. "
+	)
+);
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swa = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swa_(new instrument_impl(swa));
+
+		result = swa_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}

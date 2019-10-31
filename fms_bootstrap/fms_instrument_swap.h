@@ -23,10 +23,10 @@ namespace fms::instrument {
 		{ }
 		
 		auto make_time(const U &maturity, const T &frequency) {
-			assert(maturity >0);
-			assert(frequency > 0);
-			typename U::fms::sequency::list res();
-			res.push_back(0);
+			//assert(maturity >0);
+			//assert(frequency > 0);
+			fms::sequence::list<U> res({0});
+			
 			int i;
 			for (i = 1; i / frequency < maturity; i++) {
 				res.push_back(i / frequency);				
@@ -34,24 +34,24 @@ namespace fms::instrument {
 			if (std::abs(i / frequency - maturity) < std::numeric_limits<U>::epsilon()) {
 				
 			}
-			else {
+			else {				
 				res.push_back(maturity);
 			}
 			return res;
 		}
 		auto make_cash(const U &maturity, const T &frequency, const C &coupon) {
-			assert(maturity > 0);
-			assert(frequency > 0);
-			typename U::fms::sequency::list res();
-			res.push_back(-1);
+			//assert(maturity > 0);
+			//assert(frequency > 0);
+			fms::sequence::list<U> res({-1});
+			
 			int i;
 			for (i = 1; i / frequency < maturity; i++) {
 				res.push_back(coupon / frequency);
 			}
 			if (std::abs(i / frequency - maturity) < std::numeric_limits<U>::epsilon()) {
-				res[res.size() - 1] += 1;
+				res.push_back(coupon/frequency+1);
 			}
-			else {
+			else {				
 				res.push_back(1);
 			}
 			return res;
