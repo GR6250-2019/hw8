@@ -125,6 +125,82 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 
 }
 
+
+//!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENT")
+	.Arg(XLL_DOUBLE, L"effective", L"effective date.")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the cash deposit matures.")
+	.Arg(XLL_DOUBLE, L"rate", L"is the simple compounding rate for the cash deposit.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a forward rate instrument.")
+	.Documentation(
+		L"A cash deposit has two cash flows. The first is at time 0 and is always -1. "
+		L"This corresponds to having initial price 1. "
+		L"The second occurs at " C_(L"tenor") L" and is equal to  1 + r" delta_
+		L" where r is the simple compounding " C_(L"rate") L" and " delta_
+		L" is the " C_(L"tenor") L" in years. "
+	)
+);
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double rate)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto fra = fms::instrument::forward_rate_agreement(effective, tenor, rate);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
+//!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the time in years at which the cash deposit matures.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the frequency.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the coupon rate.")
+
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a swap.")
+	.Documentation(
+		L"A cash deposit has two cash flows. The first is at time 0 and is always -1. "
+		L"This corresponds to having initial price 1. "
+		L"The second occurs at " C_(L"tenor") L" and is equal to  1 + r" delta_
+		L" where r is the simple compounding " C_(L"rate") L" and " delta_
+		L" is the " C_(L"tenor") L" in years. "
+	)
+);
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swap = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swap_(new instrument_impl(swap));
+
+		result = swap_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
 
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
