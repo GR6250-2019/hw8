@@ -172,11 +172,10 @@ AddIn xai_instrument_swap(
 	.Category(CATEGORY)
 	.FunctionHelp(L"Return a handle to a forward rate instrument.")
 	.Documentation(
-		L"A forward rate agreement has two cash flows. The first is at time effective and is always -1. "
-		L"This corresponds to having initial price 1. "
-		L"The second occurs at " C_(L"tenor+effective") L" and is equal to  1 + r" delta_
-		L" where r is the simple compounding " C_(L"rate") L" and " delta_
-		L" is the " C_(L"tenor") L" in years. "
+		L"A forward rate agreement has multiple cash flows. The first is at time 0 and is always -1. "
+		L"The later occurs at " C_(L"i/frequency") L" and is equal to coupon" delta_
+		L"The last occurs at maturity and is equal to 1+coupon"
+		L" where maturity is the " C_(L"maturity") L" in years. "
 	)
 );
 HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
