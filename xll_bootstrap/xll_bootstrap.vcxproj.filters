@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="README.md" />
+    <None Include="..\xll_bootstrap.chm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="xll_bootstrap.h">
