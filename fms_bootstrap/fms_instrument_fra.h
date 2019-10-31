@@ -5,3 +5,16 @@
 #pragma once
 
 //!!! Implement the class forward_rate_agreement in namespace fms::instrument.
+#include "fms_instrument_sequence.h"
+
+namespace fms::instrument {
+
+	template<class E = double, class U = double, class C = double>
+	struct forward_rate_aggrement : public sequence<fms::sequence::list<U>, fms::sequence::list<C>> {
+		forward_rate_aggrement(E effective, U tenor, C forward)
+			: sequence<fms::sequence::list<U>, fms::sequence::list<C>>(
+				fms::sequence::list<U>({ 0 , effective , effective + tenor}), fms::sequence::list<C>({ 0, -1, 1 + tenor * forward })
+				)
+		{ }
+	};
+}

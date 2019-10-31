@@ -5,7 +5,7 @@ using namespace xll;
 
 AddIn xai_bootstrap(
     Document(L"xll_bootstrap")
-	.Category(L"bootstrap")
+    .Category(L"xll_bootstrap")
     .Documentation(
         L"Excel add-in for bootstrapping piecewise constant forward curves."
     )

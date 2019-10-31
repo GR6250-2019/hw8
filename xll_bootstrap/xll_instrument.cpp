@@ -127,4 +127,76 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
 
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENT")
+	.Arg(XLL_DOUBLE, L"effective", L"is the date on which the first cash flow is given.")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the cash deposit matures.")
+	.Arg(XLL_DOUBLE, L"forward", L"is the interest rate agreed upon by the parties involved.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a forward rate agreement instrument.")
+	.Documentation(
+		L"Forward rate agreements have two cash flows: -1 at the effective date"
+		L"the cash flow is always 0 at time 0 "
+		L"and 1 + forward*tenor at the expriation date = effective + tenor. "
+		
+		
+	)
+);
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto fra = fms::instrument::forward_rate_aggrement(effective, tenor, forward);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the date at which the swap is no longer effective.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the length of time between payments during the swap.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the coupon rate of the instrument.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a interest rate swap instrument.")
+	.Documentation(
+		L"A swap is determined by (maturity, frequency, coupon). It has cashflows"
+		L"-1 at 0, coupon/frequency, at times i/frequency for i = 1, 2, ..., n - 1, "
+		L"and 1 + coupon/frequence at maturity = n/frequency. "
+		L" Time is measured in years. Frequency is the number of coupons per year. "
+		
+	)
+);
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swap = fms::instrument::Interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swap_(new instrument_impl(swap));
+
+		result = swap_.get();
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
