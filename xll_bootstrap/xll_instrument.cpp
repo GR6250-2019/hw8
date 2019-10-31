@@ -126,5 +126,80 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 }
 
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENT")
+	.Arg(XLL_DOUBLE, L"effective", L"is the time in years at which the forward becomes effective.")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the forward matures.")
+	.Arg(XLL_DOUBLE, L"forward", L"is the compounding rate for the forward.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a forward rate agreement instrument.")
+	.Documentation(
+		L"A forward rate agreement has three cash flows. The first is at time 0 and is always 0. "
+		L"This corresponds to having initial price 0. "
+		L"The second occurse at " C_(L"effective") L" and is equal to -1."
+		L"The third occurs at " C_(L"effective+tenor") L" and is equal to  1 + r" delta_
+		L" where r is " C_(L"forward rate") L" and " delta_
+		L" is the " C_(L"tenor") L" in years. "
+	)
+);
+
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto fra = fms::instrument::forward_rate_agreement(effective,tenor, forward);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
+
+
 
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the time of the maturity.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the times coupons take place.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the cash flow before maturity.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a interest rate(swap) instrument.")
+	.Documentation(
+		L"A interest rate swap has n(i) cash flows. The first is at time 0 and is always -1. "
+		L"Then it has cash flows, coupon/frequency, at time i/frequency for i = 1,2...,n-1"
+		L"The last one occurs at " C_(L"maturity") L" and is equal to  1 + coupon/frequency" 
+	)
+);
+
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swap = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swap_(new instrument_impl(swap));
+		
+		result = swap_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
