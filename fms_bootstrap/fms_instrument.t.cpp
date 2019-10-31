@@ -45,3 +45,78 @@ int test_instrument_cd()
 	return 0;
 }
 int test_instrument_cd_int_int = test_instrument_cd<int, int>();
+
+template<class U, class C>
+int test_instrument_fra()
+{
+	forward_rate_agreement<U, C> fra(1, 2, 3);
+
+	auto u = fra.time();
+	assert(1 == *u);
+	++u;
+	assert(3 == *u);
+
+	auto c = fra.cash();
+	assert(-1 == *c);
+	++c;
+	assert(1 + 2 * 3 == *c);
+
+	assert(std::pair(1, -1) == *fra);
+	++fra;
+	assert(std::pair(3, 1 + 2 * 3) == *fra);
+	++fra;
+	assert(!fra);
+
+	return 0;
+}
+int test_instrument_fra_int_int = test_instrument_fra<int, int>();
+
+template<class U, class C>
+int test_instrument_swap()
+{
+	U U_EPSILON = 1e-6;
+	C C_EPSILON = 1e-6;
+	interest_rate_swap<U, C> swap(2, 2, 6);
+
+	auto u = swap.time();
+	assert(std::abs(0.0 - *u) < U_EPSILON);
+	++u;
+	assert(std::abs(0.5 - *u) < U_EPSILON);
+	++u;
+	assert(std::abs(1.0 - *u) < U_EPSILON);
+	++u;
+	assert(std::abs(1.5 - *u) < U_EPSILON);
+	++u;
+	assert(std::abs(2.0 - *u) < U_EPSILON);
+
+	auto c = swap.cash();
+	assert(std::abs(-1.0 - *c) < C_EPSILON);
+	++c;
+	assert(std::abs(6.0 / 2.0 - *c) < C_EPSILON);
+	++c;
+	assert(std::abs(6.0 / 2.0 - *c) < C_EPSILON);
+	++c;
+	assert(std::abs(6.0 / 2.0 - *c) < C_EPSILON);
+	++c;
+	assert(std::abs(1.0 + 6.0 / 2.0 - *c) < C_EPSILON);
+	++c;
+
+	assert(std::abs(0.0 - (*swap).first) < U_EPSILON);
+	assert(std::abs(-1.0 - (*swap).second < C_EPSILON));
+	++swap;
+	assert(std::abs(0.5 - (*swap).first) < U_EPSILON);
+	assert(std::abs(6.0 / 2.0 - (*swap).second < C_EPSILON));
+	++swap;
+	assert(std::abs(1.0 - (*swap).first) < U_EPSILON);
+	assert(std::abs(6.0 / 2.0 - (*swap).second < C_EPSILON));
+	++swap;
+	assert(std::abs(1.5 - (*swap).first) < U_EPSILON);
+	assert(std::abs(6.0 / 2.0 - (*swap).second < C_EPSILON));
+	++swap;
+	assert(std::abs(2.0 - (*swap).first) < U_EPSILON);
+	assert(std::abs(1.0 + 6.0 / 2.0 - (*swap).second < C_EPSILON));
+	++swap;
+	assert(!swap);
+	return 0;
+}
+int test_instrument_swap_double_double = test_instrument_swap<double, double>();
