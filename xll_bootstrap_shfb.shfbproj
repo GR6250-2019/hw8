@@ -97,6 +97,8 @@
     <None Include="INSTRUMENT.SEQUENCE.aml" />
     <None Include="xll_bootstrap.aml" />
     <None Include="PWFLAT.FORWARD.aml" />
+    <None Include="PWFLAT.FORWARD.DISCOUNT.aml" />
+    <None Include="PWFLAT.FORWARD.SPOT.aml" />
     <None Include="PWFLAT.FORWARD.VALUE.aml" />
     <None Include="xll_bootstrap.aml" />
     <None Include="INSTRUMENT.aml" />
