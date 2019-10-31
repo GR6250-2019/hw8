@@ -178,9 +178,9 @@ HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double cou
 #pragma XLLEXPORT
 	handlex result;
 	try {
-		auto swa = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
-		handle<xll::instrument<>> swa_(new instrument_impl(swa));
-		result = swa_.get();
+		auto sw = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> sw_(new instrument_impl(sw));
+		result = sw_.get();
 	}
 	catch (const std::exception& ex) {
 		XLL_ERROR(ex.what());

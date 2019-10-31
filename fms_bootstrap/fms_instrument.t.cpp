@@ -79,35 +79,26 @@ int test_instrument_swap()
 	auto u = swap.time();
 	assert(0 == *u);
 	++u;
-	assert(0.5 == *u);
+	assert(1 == *u);
 	++u;
 	assert(1 == *u);
 	++u;
-	assert(1.5 == *u);
-	++u;
-	assert(1.7 == *u);
+	assert(2 == *u);
 
 	auto c = swap.cash();
 	assert(-1 == *c);
 	++c;
-	assert(1.5 == *c);
+	assert(3 == *c);
 	++c;
-	assert(1.5 == *c);
-	++c;
-	assert(1.5 == *c);
-	++c;
-	assert(1 == *c);
+	assert(4 == *c);
+	
 
-	assert(std::pair(0.0, -1.0) == *swap);
+	assert(std::pair(0, -1) == *swap);
 	++swap;
-	assert(std::pair(0.5, 1.5) == *swap);
+	assert(std::pair(1, 3) == *swap);
 	++swap;
-	assert(std::pair(1.0, 1.5) == *swap);
-	++swap;
-	assert(std::pair(1.5, 1.5) == *swap);
-	++swap;
-	assert(std::pair(1.7, 1.0) == *swap);
-	++swap;
+	assert(std::pair(2, 4) == *swap);
+	
 	assert(!swap);
 
 	return 0;
