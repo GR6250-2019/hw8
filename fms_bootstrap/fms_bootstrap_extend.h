@@ -5,8 +5,18 @@
 #include <utility>
 #include "../fms_sequence/fms_sequence.h"
 #include "fms_pwflat.h"
+#include "fms_instrument_sequence.h"
 
 namespace fms::bootstrap {
+
+	// Present value of instrument given a forward curve.
+	template<class U, class C>
+	inline auto pv(const pwflat::forward<U, C>& f, const instrument::sequence<U, C>& i)
+	{
+		const auto D = [&f](auto t) { return f.discount(t); };
+
+		return sum(i.cash(), sequence::apply(D, i.time()));
+	}
 
 	//template<class X>
 	//constexpr X NaN = std::numeric_limits<X>::quiet_NaN();
@@ -19,7 +29,7 @@ namespace fms::bootstrap {
 		return  - log((p - pv) / (cu*Du)) / du;
 	}
 
-	// Extend curve having two cash flows past the end of the curve
+	// Extend curve having two cash flows past the end of the curve with pv 0.
 	// 0 = c0 D0 + c1 D1, Dj = D(u) exp(-f (uj - u))
 	template<class C, class T>
 	inline C extend2(C c0, T u0, C c1, T u1)
@@ -46,15 +56,13 @@ namespace fms::bootstrap {
 
 		// Cash flow times up to t.
 		auto u_ = filter([t](auto _u) { return _u < t; }, u);	
-		size_t n;
-		n = length(u_);
 		auto D_ = apply(D, u_);
 		auto pv_ = sum(c * D_);
 
 		auto n_ = length(u_);
 		auto _u = skip(n_, u);
 		auto _c = skip(n_, c);
-		auto _n = length(_u); // remaining cash flows
+		auto _n = length(_u); // remaining cash flows 
 
 		if (_n == 0) {
 			return std::pair(std::numeric_limits<double>::quiet_NaN(), std::numeric_limits<double>::quiet_NaN());
@@ -70,18 +78,22 @@ namespace fms::bootstrap {
 
 			return std::pair(u1, extend2(c0, u0, c1, u1));
 		}
-		
-		auto _pv = [_u, _c, &f, &D](double _f) { f.extrapolate(_f);  return sum(_c, apply(D, _u)); };
 
-		double f0 = 0.01, f1 = 0.02; // initial guesses for secant
-		auto _pv0 = _pv(f0);
-		auto _pv1 = _pv(f1);
+		double f0 = 0.01;
+		const instrument::sequence i(_c, _u);
+		f.extrapolate(f0);
+		auto _pv0 = pv(f, i);
+
+		auto f1 = 0.02; // initial guesses for secant
+		f.extrapolate(f1);
+		auto _pv1 = pv(f, i);
 		
 		// Find root using secant method.
 		while (fabs(-p + pv_ + _pv1) >= 1e-8) {
 			double f2 = (f0 * _pv1 - f1*_pv0) / (_pv1 - _pv0);
 			_pv0 = _pv1;
-			_pv1 = _pv(f2);
+			f.extrapolate(f2);
+			_pv1 = pv(f, i);
 			f0 = f1;
 			f1 = f2;
 		}

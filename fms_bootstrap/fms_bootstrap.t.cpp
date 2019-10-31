@@ -20,8 +20,21 @@ int scratch()
 }
 int scratch_double = scratch<double>();
 
+int test_bootstrap_pv()
+{
+	auto i = fms::instrument::sequence(list({ 0., 1., 2. }), list({ 0.01, 0.02, 0.03 }));
+	auto f = forward(list({ 1.5, 2.5 }), list({ 0.05, 0.06 }));
+
+	double p = pv(f, i);
+	p = p;
+
+	return 0;
+}
+int test_bootstrap_pv_ = test_bootstrap_pv();
+
 int test_bootstrap_extend()
 {
+	constexpr double eps = std::numeric_limits<double>::epsilon();
 	auto t = list<double>{};
 	auto f = list<double>{};
 	forward F(t,f);
@@ -35,9 +48,6 @@ int test_bootstrap_extend()
 		assert(u == 0.25);
 		auto p = 1.01 * exp(-r * 0.25);
 		assert(p == 1);
-
-		_t = u;
-		_f = r;
 	}
 	{
 		auto cd0 = fms::instrument::sequence(list({ 0., 0.25 }), list({ -1., 1.01 }));
@@ -47,16 +57,52 @@ int test_bootstrap_extend()
 		assert(u == 0.25);
 		auto p = 1.01 * exp(-r * 0.25);
 		assert(p == 1);
+
+		_t = u;
+		_f = r;
+	}
+	t.push_back(_t);
+	f.push_back(_f);
+#pragma warning(push)
+#pragma warning(disable: 4456)
+	{
+		forward F(t, f);
+		auto cd1 = fms::instrument::sequence(list({ 0., 0.5 }), list({ -1., 1.05 }));
+		auto [u, r] = extend(F, _t, 0., cd1.time(), cd1.cash());
+		assert(u == 0.5);
+		auto p = 1.05 * F.discount(0.25) * exp(-r*(0.5 - 0.25));
+		assert(fabs(p - 1) <= eps);
+
+		_t = u;
+		_f = r;
 	}
 	t.push_back(_t);
 	f.push_back(_f);
 	{
-		auto cd1 = fms::instrument::sequence(list({ 0., 0.5 }), list({ -1., 1.05 }));
-		auto [u, r] = extend(F, _t, 0., cd1.time(), cd1.cash());
-		assert(u == 0.5);
-		//auto p = 1.01 * exp(-r * 0.25);
-		//assert(p == 1);
+		forward F(t, f);
+		auto fra0 = fms::instrument::sequence(list({ 0.6, 1.0 }), list({ -1., 1.05 }));
+		auto [u, r] = extend(F, _t, 0., fra0.time(), fra0.cash());
+		assert(u == 1.0);
+		auto p = -1 + 1.05 * exp(-r * (1.0 - 0.6));
+		assert(fabs(p) <= eps);
+
+		_t = u;
+		_f = r;
 	}
+	t.push_back(_t);
+	f.push_back(_f);
+	{
+		forward F(t, f);
+		auto swap0 = fms::instrument::sequence(list({ 0., 1., 2. }), list({ -1., 0.5, 1.05 }));
+		auto [u, r] = extend(F, _t, 0., swap0.time(), swap0.cash());
+		assert(u == 2.0);
+		auto p = sum(swap0.cash(), apply([&F](auto t) { return F.discount(t); }, swap0.time()));
+		assert(fabs(p) <= eps);
+
+		_t = u;
+		_f = r;
+	}
+
 
 	/*
 	C r = 0.01;
@@ -70,6 +116,7 @@ int test_bootstrap_extend()
 	f = bootstrap(f, cd1);
 	*/
 	return 0;
+#pragma warning(pop)
 }
 int test_bootstrap_extend_ = test_bootstrap_extend();
 
