@@ -45,3 +45,65 @@ int test_instrument_cd()
 	return 0;
 }
 int test_instrument_cd_int_int = test_instrument_cd<int, int>();
+
+template<class U, class C>
+int test_instrument_fra()
+{
+	fra_contract<U,C> fra(1, 2, 3);
+
+	auto u = fra.time();
+	assert(0 == *u);
+	++u;
+	assert(1 == *u);
+	++u;
+	assert(2 == *u);
+
+	auto c = fra.cash();
+	assert(0 == *c);
+	++c;
+	assert(-1 == *c);
+	++c;
+	assert(1 + 2 * 3 == *c);
+
+	assert(std::pair(0, 0) == *fra);
+	++fra;
+	assert(std::pair(1, -1) == *fra);
+	++fra;
+	assert(std::pair(2, 1 + 2 * 3) == *fra);
+	++fra;
+	assert(!fra);
+
+	return 0;
+}
+int test_instrument_fra_int_int = test_instrument_fra<int, int>();
+
+template<class U, class C>
+int test_instrument_swap()
+{
+	swap_contract<U,C> swap(2, 1, 1);
+
+	auto u = swap.time();
+	assert(0 == *u);
+	++u;
+	assert(1 == *u);
+	++u;
+	assert(2 == *u);
+
+	auto c = swap.cash();
+	assert(-1 == *c);
+	++c;
+	assert(1 == *c);
+	++c;
+	assert(1 + 1 == *c);
+
+	assert(std::pair(0, -1) == *swap);
+	++swap;
+	assert(std::pair(1, 1) == *swap);
+	++swap;
+	assert(std::pair(2, 2) == *swap);
+	++swap;
+	assert(!swap);
+
+	return 0;
+}
+int test_instrument_swap_int_int = test_instrument_swap<int, int>();
