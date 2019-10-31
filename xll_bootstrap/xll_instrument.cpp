@@ -125,6 +125,77 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 
 }
 
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENT")
+	.Arg(XLL_DOUBLE, L"effective", L"is the time fra is effective")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the fra matures.")
+	.Arg(XLL_DOUBLE, L"rate", L"is the simple compounding rate for the fra.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a fra instrument.")
+	.Documentation(
+		L"A forward rate agreement has two cash flows. The first is at time effective and is always -1. "
+		L"This corresponds to having initial price 1. "
+		L"The second occurs at " C_(L"tenor") L" and is equal to  1 + r" delta_
+		L" where r is the simple compounding " C_(L"rate") L" and " delta_
+		L" is the " C_(L"tenor") L" in years. "
+	)
+);
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double rate)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto fra = fms::instrument::forward_rate_agreement(effective, tenor, rate);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
+
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
 
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the number of years swap matures")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the frequency of coupon in a year.")
+	.Arg(XLL_DOUBLE, L"rate", L"is the simple compounding rate for the swap.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a wap instrument.")
+	.Documentation(
+		L"A interest swap agreement has maturity*frequency cash flows. The first is at time 0 and is always -1. "
+		L"This corresponds to having initial price 1. The second and any before maturity payment is coupon and the last payment is 1+coupon"
+		
+	)
+);
+HANDLEX WINAPI xll_instrument_swap(double effective, double tenor, double rate)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto sp = fms::instrument::swap(effective, tenor, rate);
+		handle<xll::instrument<>> sp_(new instrument_impl(sp));
+
+		result = sp_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
