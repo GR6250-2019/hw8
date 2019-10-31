@@ -148,6 +148,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\x64\Debug\Help\xll_bootstrap.chm" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
