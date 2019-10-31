@@ -127,4 +127,74 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
 
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENTS")
+	.Arg(XLL_DOUBLE, L"effective", L"is the time in years at which the forward contract become effective.")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the forward contract matures.")
+	.Arg(XLL_DOUBLE, L"forward", L"is the simple compounding rate for the forward.")
+	.Uncalced()
+	.FunctionHelp(L"Return a handle to a forward rate agreement instrument.")
+	.Documentation(
+		L"fms_instrument_fra.h - Forward Rate Agreement."
+		L"Forward rate agreements have two cash flows: -1 at the effective date"
+		L"and 1 + forward*tenor at the expriation date = effective + tenor"
+		L"The argument order for the constructor is (effective, tenor, forward)"
+	)
+);
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto fra = fms::instrument::forward_rate_agreements(effective, tenor, forward);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
+
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the time in years at which the swap matures.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the number of coupons per year.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the coupon amount paid per year.")
+	.Uncalced()
+	.FunctionHelp(L"Return a handle to a swap instrument.")
+	.Documentation(
+		L" fms_instrument_swap.h - Interest rate swap."
+		L" A swap is determined by (maturity, frequency, coupon). It has cashflows"
+		L"-1 at 0, coupon/frequency, at times i/frequency for i = 1, 2, ..., n - 1,"
+		L" and 1 + coupon/frequence at maturity = n/frequency."
+		L" Time is measured in years. Frequency is the number of coupons per year.")
+);
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swap = fms::instrument::swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swap_(new instrument_impl(swap));
+
+		result = swap_.get();
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
+
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
