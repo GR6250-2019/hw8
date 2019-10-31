@@ -28,7 +28,7 @@ namespace fms::instrument {
 
 	template<class U = double, class C = double>
 	auto make_cash(U m, U f, C c) {
-		std::vector<U> myList2 = {};
+		std::vector<C> myList2 = {};
 		for (int i = 0; i <= m * f; i++) {
 			if (i == 0) {
 				myList2.push_back(-1);

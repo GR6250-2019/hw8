@@ -170,7 +170,7 @@ HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
 AddIn xai_instrument_swap(
 	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
-	.Arg(XLL_DOUBLE, L"maturity", L"is the time of the maturity.")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the time at which the swap matures.")
 	.Arg(XLL_DOUBLE, L"frequency", L"is the times coupons take place.")
 	.Arg(XLL_DOUBLE, L"coupon", L"is the cash flow before maturity.")
 	.Uncalced()
