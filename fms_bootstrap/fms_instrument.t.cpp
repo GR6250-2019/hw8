@@ -115,4 +115,4 @@ int test_instrument_swap()
 
 	return 0;
 }
-int test_instrument_swap_int_int_int = test_instrument_swap<double, double, int>();
+int test_instrument_swap_double_int_double= test_instrument_swap<double, int, double>();

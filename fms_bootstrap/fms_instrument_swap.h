@@ -14,7 +14,7 @@ namespace fms::instrument {
 
 	//!!! Implement the class interest_rate_swap in namespace fms::instrument.
 
-	template<class U = double, class C = double, class T=int>
+	template<class U = double, class T=int, class C = double>
 	struct interest_rate_swap : public sequence<fms::sequence::list<U>, fms::sequence::list<C>> {
 		interest_rate_swap(U maturity, T frequency, C coupon)
 			: sequence<fms::sequence::list<U>, fms::sequence::list<C>>(
