@@ -111,7 +111,6 @@ int test_bootstrap_extend()
 	fra fra1(.25, 1, r);
 	//...
 	swap swap1(2, 0.5, r);
-
 	forward f;
 	f = bootstrap(f, cd1);
 	*/
