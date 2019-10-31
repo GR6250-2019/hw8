@@ -46,7 +46,7 @@ HANDLEX WINAPI xll_instrument_sequence(const _FP12* pu, const _FP12* pc)
 
 		result = inst.get();
 	}
-	catch (const std::exception & ex) {
+	catch (const std::exception& ex) {
 		XLL_ERROR(ex.what());
 
 		return 0; // #NUM!
@@ -80,7 +80,7 @@ _FP12* WINAPI xll_instrument_cash_flows(HANDLEX inst)
 		}
 		result.resize(result.size() / 2, 2);
 	}
-	catch (const std::exception & ex) {
+	catch (const std::exception& ex) {
 		XLL_ERROR(ex.what());
 
 		return 0; // #NUM!
@@ -115,7 +115,7 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 
 		result = cd_.get();
 	}
-	catch (const std::exception & ex) {
+	catch (const std::exception& ex) {
 		XLL_ERROR(ex.what());
 
 		return 0; // #NUM!
@@ -126,5 +126,74 @@ HANDLEX WINAPI xll_instrument_cd(double tenor, double rate)
 }
 
 //!!! Implement INSTRUMENT.FORWARD_RATE_AGREEMENT(effective, tenor, forward)
+AddIn xai_instrument_fra(
+	Function(XLL_HANDLE, L"?xll_instrument_fra", CATEGORY L".FORWARD_RATE_AGREEMENT")
+	.Arg(XLL_DOUBLE, L"effective", L"is the date on which the first cash flow is given.")
+	.Arg(XLL_DOUBLE, L"tenor", L"is the time in years at which the cash deposit matures.")
+	.Arg(XLL_DOUBLE, L"forward", L"is the interest rate agreed upon by the parties involved.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a forward rate agreement instrument.")
+	.Documentation(
+		L"A forward rate agreement has 2 cash flows. "
+		L"At time 0, the cash flow is always 0. Then, at the effective date, there is a cash flow of -1. "
+		L"Then, at maturity, tenor + effective, there is a cash flow of 1 + forward x tenor."
+	)
+);
+HANDLEX WINAPI xll_instrument_fra(double effective, double tenor, double forward)
+{
+#pragma XLLEXPORT
+	handlex result;
 
+	try {
+		auto fra = fms::instrument::forward_rate_agreement(effective, tenor, forward);
+		handle<xll::instrument<>> fra_(new instrument_impl(fra));
+
+		result = fra_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
 //!!! Implement INSTRUMENT.INTEREST_RATE_SWAP(maturity, frequency, coupon)
+AddIn xai_instrument_swap(
+	Function(XLL_HANDLE, L"?xll_instrument_swap", CATEGORY L".INTEREST_RATE_SWAP")
+	.Arg(XLL_DOUBLE, L"maturity", L"is the date at which the swap is no longer effective.")
+	.Arg(XLL_DOUBLE, L"frequency", L"is the length of time between payments during the swap.")
+	.Arg(XLL_DOUBLE, L"coupon", L"is the coupon rate of the instrument.")
+	.Uncalced()
+	.Category(CATEGORY)
+	.FunctionHelp(L"Return a handle to a interest rate swap instrument.")
+	.Documentation(
+		L"An interest rate swap has n + 1 cash flows, where n is the number of payments, n = maturity * frequency. "
+		L"The first is at time 0 and is always -1. Then, the first coupon is paid at 1 / frequency, the second at "
+		L"2 / frequency, and so on, until (n - 1) / frequency with cash flows c / frequency, where c "
+		L" is the coupon rate. "
+		L"Then, at maturity, the cash flow is 1 + c / frequency."
+	)
+);
+HANDLEX WINAPI xll_instrument_swap(double maturity, double frequency, double coupon)
+{
+#pragma XLLEXPORT
+	handlex result;
+
+	try {
+		auto swap = fms::instrument::interest_rate_swap(maturity, frequency, coupon);
+		handle<xll::instrument<>> swap_(new instrument_impl(swap));
+
+		result = swap_.get();
+	}
+	catch (const std::exception& ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result;
+
+}
