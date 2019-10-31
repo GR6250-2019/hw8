@@ -5,7 +5,7 @@
 // Time is measured in years. Frequency is the number of coupons per year.
 #pragma once
 #include "fms_instrument_sequence.h"
-
+#include <cassert>
 namespace fms::instrument {
 	
 	//!!! Implement helper functions.
@@ -23,32 +23,28 @@ namespace fms::instrument {
 		{ }
 		
 		auto make_time(const U &maturity, const T &frequency) {
-			//assert(maturity >0);
-			//assert(frequency > 0);
-			fms::sequence::list<U> res({0});
+			assert(maturity > 0);
+			assert(frequency > 0);
+			fms::sequence::list<double> res({0});
 			
 			int i;
-			for (i = 1; i / frequency < maturity; i++) {
-				res.push_back(i / frequency);				
+			for (i = 1; double(i) / frequency < maturity; i++) {
+				res.push_back(double(i) / frequency);				
 			}
-			if (std::abs(i / frequency - maturity) < std::numeric_limits<U>::epsilon()) {
-				
-			}
-			else {				
-				res.push_back(maturity);
-			}
+			res.push_back(maturity);
+			
 			return res;
 		}
 		auto make_cash(const U &maturity, const T &frequency, const C &coupon) {
-			//assert(maturity > 0);
-			//assert(frequency > 0);
-			fms::sequence::list<U> res({-1});
+			assert(maturity > 0);
+			assert(frequency > 0);
+			fms::sequence::list<double> res({-1});
 			
 			int i;
-			for (i = 1; i / frequency < maturity; i++) {
+			for (i = 1; double(i) / frequency < maturity; i++) {
 				res.push_back(coupon / frequency);
 			}
-			if (std::abs(i / frequency - maturity) < std::numeric_limits<U>::epsilon()) {
+			if (std::abs(double(i) / frequency - maturity) < std::numeric_limits<U>::epsilon()) {
 				res.push_back(coupon/frequency+1);
 			}
 			else {				
