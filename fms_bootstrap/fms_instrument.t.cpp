@@ -45,3 +45,63 @@ int test_instrument_cd()
 	return 0;
 }
 int test_instrument_cd_int_int = test_instrument_cd<int, int>();
+
+template<class U, class C>
+int test_instrument_fra()
+{
+	forward_rate_agreements<U, U, C> fra(1, 2, 3);
+
+	auto u = fra.time();
+	assert(1 == *u);
+	++u;
+	assert(1 + 2 == *u);
+
+	auto c = fra.cash();
+	assert(-1 == *c);
+	++c;
+	assert(1 + 3 * 2 == *c);
+
+	assert(std::pair(1, -1) == *fra);
+	++fra;
+	assert(std::pair(1 + 2, 1 + 3 * 2) == *fra);
+	++fra;
+	assert(!fra);
+
+	return 0;
+}
+
+template<class U, class C>
+int test_instrument_swap() 
+{
+	interest_rate_swap<U, U, C> swap<1, 3, 1>;
+
+	auto u = swap.time();
+	assert(0 == *u);
+	++u;
+	assert(1 / 3 == *u);
+	++u;
+	assert(2 / 3 == *u);
+	++u;
+	assert(1 == *u);
+
+	auto c = swap.cash();
+	assert(-1 == *c);
+	++c;
+	assert(1 / 3 == *c);
+	++c;
+	assert(1 / 3 == *c);
+	++c;
+	assert(1 + 1 / 3 == *c);
+
+	assert(std::pair(0, -1) == *swap);
+	++swap;
+	assert(std::pair(1 / 3, 1 / 3) == *swap);
+	++swap;
+	assert(std::pair(2 / 3, 1 / 3) == *swap);
+	++swap;
+	assert(std::pair(1, 1 + 1 / 3) == *swap);
+	++swap;
+	assert(!swap);
+
+	return 0;
+}

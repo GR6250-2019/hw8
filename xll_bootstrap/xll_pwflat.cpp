@@ -85,6 +85,47 @@ _FP12* WINAPI xll_pwflat_forward_value(HANDLEX fwd, const _FP12* pt)
 }
 
 //!!! Implement PWFLAT.FORWARD.SPOT
+_FP12* WINAPI xll_pwflat_forward_spot(HANDLEX fwd, const _FP12* pt)
+{
+#pragma XLLEXPORT
+	static xll::FP12 result;
+
+	try {
+		handle<forward> fwd_(fwd);
+
+		result.resize(rows(*pt), columns(*pt));
+		for (int i = 0; i < size(*pt); ++i) {
+			result[i] = fwd_->value(pt->array[0]);
+		}
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result.get();
+}
 
 //!!! Implement PWFLAT.FORWARD.DISCOUNT
+_FP12* WINAPI xll_pwflat_forward_discount(HANDLEX fwd, const _FP12* pt)
+{
+#pragma XLLEXPORT
+	static xll::FP12 result;
 
+	try {
+		handle<forward> fwd_(fwd);
+
+		result.resize(rows(*pt), columns(*pt));
+		for (int i = 0; i < size(*pt); ++i) {
+			result[i] = fwd_->value(pt->array[0])/ fwd_->value(pt->array[i]);
+		}
+	}
+	catch (const std::exception & ex) {
+		XLL_ERROR(ex.what());
+
+		return 0; // #NUM!
+	}
+
+	return result.get();
+}
