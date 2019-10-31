@@ -75,7 +75,7 @@ template<class U, class C,class T>
 int test_instrument_swap()
 {
 	//(maturity, frequency, coupon)
-	interest_rate_swap<U, C, T> swap(2, 2, 3);
+	interest_rate_swap<U, C, T> swap(1.7, 2, 3);
 
 	auto u = swap.time();
 	assert(0 == *u);
@@ -86,7 +86,7 @@ int test_instrument_swap()
 	++u;
 	assert(1.5 == *u);
 	++u;
-	assert(2 == *u);
+	assert(1.7 == *u);
 
 
 	auto c = swap.cash();
@@ -98,7 +98,7 @@ int test_instrument_swap()
 	++c;
 	assert(1.5 == *c);
 	++c;
-	assert(2.5 == *c);
+	assert(1 == *c);
 
 
 	assert(std::pair(0.0, -1.0) == *swap);
@@ -109,7 +109,7 @@ int test_instrument_swap()
 	++swap;
 	assert(std::pair(1.5, 1.5) == *swap);
 	++swap;
-	assert(std::pair(2.0, 2.5) == *swap);
+	assert(std::pair(1.7, 1.0) == *swap);
 	++swap;
 	assert(!swap);
 
